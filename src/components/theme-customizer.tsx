@@ -62,8 +62,9 @@ export function ThemeCustomizer() {
             </CardHeader>
             <CardContent className="pt-0">
               <Tabs defaultValue="colors" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="colors">Màu sắc</TabsTrigger>
+                  <TabsTrigger value="fonts">Font</TabsTrigger>
                   <TabsTrigger value="config">Cấu hình</TabsTrigger>
                 </TabsList>
                 
@@ -80,6 +81,28 @@ export function ThemeCustomizer() {
                       </div>
                     ))}
                   </div>
+                </TabsContent>
+                
+                <TabsContent value="fonts" className="space-y-2">
+                  {currentTheme.fonts ? (
+                    <div className="space-y-3">
+                      {Object.entries(currentTheme.fonts).map(([key, value]) => (
+                        <div key={key} className="space-y-1">
+                          <Label className="text-xs font-medium capitalize">{key}:</Label>
+                          <div 
+                            className="text-xs p-2 rounded border bg-muted/50"
+                            style={{ fontFamily: value }}
+                          >
+                            {value}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-xs text-muted-foreground">
+                      Theme này không có cấu hình font tùy chỉnh
+                    </div>
+                  )}
                 </TabsContent>
                 
                 <TabsContent value="config" className="space-y-2">

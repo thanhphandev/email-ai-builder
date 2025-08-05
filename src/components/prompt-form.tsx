@@ -75,17 +75,19 @@ export default function PromptForm({
                     type="submit"
                     size="lg"
                     disabled={isLoading || !prompt.trim()}
-                    className="w-full bg-[var(--primary)] text-[var(--primary-foreground)] hover:brightness-95 focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+                    className="w-full bg-[var(--color-primary)] text-[var(--color-primary-foreground)] 
+             hover:brightness-95 focus-visible:ring-2 
+             focus-visible:ring-[var(--color-ring)]"
                 >
                     {isLoading ? (
                         <>
                             <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                            Generating with {aiProvider === 'openai' ? 'GPT-4' : 'Gemini'}...
+                            Generating with {aiProvider === "openai" ? "GPT-4" : "Gemini"}...
                         </>
                     ) : (
                         <>
                             <Sparkles className="w-5 h-5 mr-2" />
-                            Generate with {aiProvider === 'openai' ? 'GPT-4' : 'Gemini'}
+                            Generate with {aiProvider === "openai" ? "GPT-4" : "Gemini"}
                         </>
                     )}
                 </Button>

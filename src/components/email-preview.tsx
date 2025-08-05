@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils"
 import { DeviceFrameset } from "react-device-frameset"
 import "react-device-frameset/styles/marvel-devices.min.css"
 import { Laptop2, Smartphone, Tablet, Monitor } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "./ui/button"
 
 interface EmailPreviewProps {
   html: string
@@ -74,60 +76,50 @@ export function EmailPreview({ html }: EmailPreviewProps) {
       {/* Header Controls: chỉ hiện trên desktop */}
       {!isMobileViewport && (
         <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
+          {/* Tiêu đề */}
           <div className="flex items-center space-x-2">
             <Monitor className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm font-medium text-foreground">Email Preview</span>
           </div>
+
           <div className="flex items-center gap-4">
             {/* Nút đổi chế độ */}
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => handleViewModeChange("desktop")}
-                className={cn(
-                  "p-2 rounded-lg transition-colors",
-                  viewMode === "desktop"
-                    ? "bg-primary/10 text-primary"
-                    : "hover:bg-muted text-muted-foreground"
-                )}
-              >
-                <Laptop2 className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={() => handleViewModeChange("tablet")}
-                className={cn(
-                  "p-2 rounded-lg transition-colors",
-                  viewMode === "tablet"
-                    ? "bg-primary/10 text-primary"
-                    : "hover:bg-muted text-muted-foreground"
-                )}
-              >
-                <Tablet className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={() => handleViewModeChange("mobile")}
-                className={cn(
-                  "p-2 rounded-lg transition-colors",
-                  viewMode === "mobile"
-                    ? "bg-primary/10 text-primary"
-                    : "hover:bg-muted text-muted-foreground"
-                )}
-              >
-                <Smartphone className="w-4 h-4" />
-              </button>
+              {[
+                { mode: "desktop", icon: Laptop2 },
+                { mode: "tablet", icon: Tablet },
+                { mode: "mobile", icon: Smartphone },
+              ].map(({ mode, icon: Icon }) => (
+                <Button
+                  key={mode}
+                  variant={viewMode === mode ? "secondary" : "ghost"}
+                  size="icon"
+                  onClick={() => handleViewModeChange(mode as typeof viewMode)}
+                  className={cn(
+                    "rounded-lg",
+                    viewMode === mode
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-muted"
+                  )}
+                >
+                  <Icon className="w-4 h-4" />
+                </Button>
+              ))}
             </div>
 
-            {/* Chọn device */}
-            <select
-              value={device}
-              onChange={(e) => setDevice(e.target.value as typeof device)}
-              className="text-sm border border-border rounded-lg px-3 py-1 bg-background text-foreground"
-            >
-              {deviceOptions[viewMode].map((opt) => (
-                <option key={opt.id} value={opt.device}>{opt.name}</option>
-              ))}
-            </select>
+            {/* Select chọn device */}
+            <Select value={device} onValueChange={(val) => setDevice(val as "MacBook Pro" | "iPhone X" | "iPhone 8" | "iPad Mini")}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Select device" />
+              </SelectTrigger>
+              <SelectContent>
+                {deviceOptions[viewMode].map((opt) => (
+                  <SelectItem key={opt.id} value={opt.device}>
+                    {opt.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-import { Theme } from "@/lib/themes"
+import { Theme, ThemeFonts } from "@/lib/themes"
 
 // Hướng dẫn tạo theme mới:
 // 1. Tạo theme configuration theo interface Theme
@@ -9,7 +9,8 @@ export const createNewTheme = (
   name: string,
   label: string,
   lightColors: Record<string, string>,
-  darkColors: Record<string, string>
+  darkColors: Record<string, string>,
+  fonts?: ThemeFonts
 ): Theme => {
   return {
     name,
@@ -57,6 +58,7 @@ export const createNewTheme = (
         ring: darkColors.ring || "oklch(0.556 0 0)",
       },
     },
+    fonts,
   }
 }
 

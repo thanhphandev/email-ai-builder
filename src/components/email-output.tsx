@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Eye, Code, AlertCircle, Loader2 } from "lucide-react"
 import { EmailCode } from "./email-code"
@@ -12,6 +13,17 @@ interface EmailOutputProps {
 }
 
 export default function EmailOutput({ generatedHtml, error, isLoading }: EmailOutputProps) {
+  // State để quản lý HTML hiện tại (có thể được chỉnh sửa)
+  const [currentHtml, setCurrentHtml] = useState(generatedHtml)
+
+  // Cập nhật currentHtml khi generatedHtml thay đổi
+  useEffect(() => {
+    setCurrentHtml(generatedHtml)
+  }, [generatedHtml])
+
+  const handleHtmlChange = (newHtml: string) => {
+    setCurrentHtml(newHtml)
+  }
   if (error) {
     return (
       <div className="bg-background/70 backdrop-blur-sm rounded-2xl p-8 border border-destructive/30 shadow-sm">
@@ -78,27 +90,38 @@ export default function EmailOutput({ generatedHtml, error, isLoading }: EmailOu
         <TabsList className="grid w-full grid-cols-2 bg-muted p-1 m-4 rounded-xl">
           <TabsTrigger
             value="preview"
-            className="flex items-center space-x-2 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg py-2"
+            className="flex items-center space-x-2 rounded-lg py-2 
+             data-[state=active]:bg-[var(--primary)] 
+             data-[state=active]:text-[var(--primary-foreground)] 
+             hover:brightness-95 focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
           >
             <Eye className="w-4 h-4" />
             <span>Preview</span>
           </TabsTrigger>
+
           <TabsTrigger
             value="code"
-            className="flex items-center space-x-2 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg py-2"
+            className="flex items-center space-x-2 rounded-lg py-2 
+             data-[state=active]:bg-[var(--primary)] 
+             data-[state=active]:text-[var(--primary-foreground)] 
+             hover:brightness-95 focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
           >
             <Code className="w-4 h-4" />
             <span>Code</span>
           </TabsTrigger>
+
         </TabsList>
 
         <div className="p-4 pt-0">
           <TabsContent value="preview" className="mt-0">
-            <EmailPreview html={generatedHtml} />
+            <EmailPreview html={currentHtml} />
           </TabsContent>
           <TabsContent value="code" className="mt-0 max-w-sm md:max-w-full">
             <div className="w-full h-[calc(100vh-2rem)] overflow-auto">
-              <EmailCode html={generatedHtml} />
+              <EmailCode
+                html={currentHtml}
+                onHtmlChange={handleHtmlChange}
+              />
             </div>
           </TabsContent>
         </div>

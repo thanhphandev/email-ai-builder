@@ -53,10 +53,10 @@ export default function Home() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
             <div className="flex flex-col items-center text-center flex-1">
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-primary">
                 AI Email Generator
               </h1>
-              <p className="mt-2 text-muted-foreground text-sm md:text-base max-w-xl">
+              <p className="mt-2 text-accent-foreground text-sm md:text-base max-w-xl">
                 Generate production-ready HTML emails instantly with GPT-4 & Gemini.
               </p>
             </div>

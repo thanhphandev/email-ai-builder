@@ -1,12 +1,13 @@
 # Hệ thống Theme
 
-Ứng dụng này có hệ thống theme linh hoạt và có thể mở rộng dễ dàng.
+Ứng dụng này có hệ thống theme linh hoạt và có thể mở rộng dễ dàng với hỗ trợ font customization.
 
 ## Tính năng
 
-- **Nhiều theme có sẵn**: Mặc định, Xanh dương, Xanh lá, Tím, Cam
+- **Nhiều theme có sẵn**: Mặc định, Xanh dương, Xanh lá, Tím, Cam, YouTube, GitHub, Chuyên nghiệp
 - **Chế độ sáng/tối**: Hỗ trợ chế độ sáng, tối và theo hệ thống
-- **Chuyển đổi mượt mà**: Hiệu ứng chuyển tiếp CSS khi thay đổi theme
+- **Font customization**: Mỗi theme có thể có font riêng cho sans, mono, và heading
+- **Chuyển đổi mượt mà**: Hiệu ứng chuyển tiếp CSS khi thay đổi theme và font
 - **Lưu trữ local**: Theme và chế độ được lưu trong localStorage
 - **Dễ mở rộng**: Có thể thêm theme mới một cách dễ dàng
 
@@ -37,6 +38,11 @@ export const themes: Theme[] = [
         primary: "oklch(0.75 0.15 120)",
         // ... các màu khác
       }
+    },
+    fonts: {
+      sans: "'Inter', sans-serif",
+      mono: "'Fira Code', monospace",
+      heading: "'Inter', sans-serif",
     }
   }
 ]
@@ -52,21 +58,43 @@ const myTheme = createNewTheme(
   "red",
   "Đỏ",
   colorPresets.red.light,
-  colorPresets.red.dark
+  colorPresets.red.dark,
+  {
+    sans: "'Roboto', sans-serif",
+    mono: "'Roboto Mono', monospace", 
+    heading: "'Roboto', sans-serif",
+  }
 )
 
 themes.push(myTheme)
 ```
 
+## Themes có sẵn
+
+### YouTube Theme
+- **Màu chính**: YouTube Red (#FF0000)
+- **Font**: Roboto family
+- **Đặc điểm**: Thiết kế hiện đại, tập trung vào video content
+
+### GitHub Theme  
+- **Màu chính**: GitHub Green (#2EA44F)
+- **Font**: Segoe UI, Helvetica Neue
+- **Đặc điểm**: Thiết kế developer-friendly, tối giản
+
+### Professional Theme
+- **Màu chính**: Neutral Gray (#424242)
+- **Font**: Helvetica Neue (như bạn yêu cầu)
+- **Đặc điểm**: Thiết kế business, chuyên nghiệp
+
 ## Cấu trúc file
 
-- `src/lib/themes.ts`: Định nghĩa các theme
-- `src/hooks/use-theme.tsx`: Hook quản lý theme và provider
+- `src/lib/themes.ts`: Định nghĩa các theme và fonts
+- `src/hooks/use-theme.tsx`: Hook quản lý theme, mode và font
 - `src/components/theme-selector.tsx`: Component chọn theme
 - `src/components/theme-toggle.tsx`: Component chuyển đổi chế độ sáng/tối
-- `src/components/theme-customizer.tsx`: Component xem chi tiết theme
+- `src/components/theme-customizer.tsx`: Component xem chi tiết theme và font
 - `src/utils/theme-creator.ts`: Utilities để tạo theme mới
-- `src/app/globals.css`: CSS với transitions và theme variables
+- `src/app/globals.css`: CSS với transitions, theme variables và font support
 
 ## API
 
@@ -77,11 +105,11 @@ const {
   setTheme,     // function để thay đổi theme
   mode,         // chế độ hiện tại: "light" | "dark" | "system"
   setMode,      // function để thay đổi chế độ
-  currentTheme  // object theme hiện tại
+  currentTheme  // object theme hiện tại (bao gồm fonts)
 } = useCustomTheme()
 ```
 
-### Theme Interface
+### Theme Interface với Font Support
 ```typescript
 interface Theme {
   name: string           // tên duy nhất
@@ -91,8 +119,28 @@ interface Theme {
     light: ThemeColors   // màu sắc cho chế độ sáng
     dark: ThemeColors    // màu sắc cho chế độ tối
   }
+  fonts?: ThemeFonts     // font configuration (optional)
+}
+
+interface ThemeFonts {
+  sans: string           // font cho text thường
+  mono: string           // font cho code
+  heading: string        // font cho headings
 }
 ```
+
+## Font System
+
+Hệ thống font được tích hợp với CSS variables:
+
+- `--font-sans`: Font cho text thường
+- `--font-mono`: Font cho code blocks
+- `--font-heading`: Font cho tiêu đề
+
+### CSS Classes tự động
+- `body`: Sử dụng `--font-sans`
+- `h1, h2, h3, h4, h5, h6`: Sử dụng `--font-heading`
+- `code, pre, .font-mono`: Sử dụng `--font-mono`
 
 ## Màu sắc hỗ trợ
 
@@ -112,4 +160,6 @@ Mỗi theme có các màu sau:
 - Theme được lưu trong localStorage với key `ui-theme`
 - Chế độ được lưu trong localStorage với key `ui-theme-mode`
 - CSS variables được cập nhật tự động khi thay đổi theme
+- Font variables được áp dụng tự động với fallback
 - Hỗ trợ SSR với suppressHydrationWarning
+- Smooth transitions cho cả màu sắc và font

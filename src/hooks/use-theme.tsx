@@ -78,6 +78,14 @@ export function CustomThemeProvider({
       const cssVar = `--${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`
       root.style.setProperty(cssVar, value)
     })
+    
+    // Apply font variables if theme has fonts
+    if (currentTheme.fonts) {
+      Object.entries(currentTheme.fonts).forEach(([key, value]) => {
+        const cssVar = `--font-${key}`
+        root.style.setProperty(cssVar, value)
+      })
+    }
   }, [theme, mode])
 
   const value = {
