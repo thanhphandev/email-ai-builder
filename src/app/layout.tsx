@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Toaster } from '@/components/ui/sonner';
 import { CustomThemeProvider } from '@/hooks/use-theme';
+import { UserProvider } from '@/hooks/use-user';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -62,10 +63,12 @@ export default function RootLayout({
           defaultTheme="default"
           storageKey="ui-theme"
         >
-          <TooltipProvider>
-            {children}
-            <Toaster position="bottom-right" />
-          </TooltipProvider>
+          <UserProvider>
+            <TooltipProvider>
+              {children}
+              <Toaster position="bottom-right" />
+            </TooltipProvider>
+          </UserProvider>
         </CustomThemeProvider>
       </body>
     </html>

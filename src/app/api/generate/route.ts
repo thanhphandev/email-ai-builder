@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
 // Constants
 const MAX_PROMPT_LENGTH = 5000
@@ -208,6 +209,14 @@ const cleanHTML = (html: string): string => {
 // Main POST handler
 export async function POST(request: NextRequest): Promise<NextResponse<APIResponse>> {
   try {
+    // Check authentication
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
+      return createError('Authentication required. Please sign in to generate emails.', 401)
+    }
+
     // Parse request body with error handling
     let body: { prompt?: unknown; provider?: unknown }
     try {
@@ -219,6 +228,22 @@ export async function POST(request: NextRequest): Promise<NextResponse<APIRespon
     // Validate input
     const { prompt, provider } = validateInput(body.prompt, body.provider || 'openai')
     
+    // Check user's usage limit
+    const { data: subscription, error: subError } = await supabase
+      .from('subscriptions')
+      .select('usage_count, usage_limit')
+      .eq('user_id', user.id)
+      .single()
+
+    if (subError) {
+      console.error('Error fetching subscription:', subError)
+      return createError('Failed to check usage limits.', 500)
+    }
+
+    if (subscription.usage_count >= subscription.usage_limit) {
+      return createError(`Usage limit reached (${subscription.usage_count}/${subscription.usage_limit}). Please upgrade your plan.`, 429)
+    }
+
     // Validate API keys
     const apiKey = validateAPIKeys(provider)
 
@@ -239,6 +264,34 @@ export async function POST(request: NextRequest): Promise<NextResponse<APIRespon
     // Clean and return HTML
     const cleanedHtml = cleanHTML(generatedHtml)
     
+    // Save template to database
+    const templateTitle = prompt.length > 50 ? prompt.substring(0, 50) + '...' : prompt
+    
+    const { error: templateError } = await supabase
+      .from('templates')
+      .insert({
+        user_id: user.id,
+        title: templateTitle,
+        prompt: prompt,
+        html_content: cleanedHtml,
+      })
+
+    if (templateError) {
+      console.error('Error saving template:', templateError)
+      // Don't fail the request, just log the error
+    }
+
+    // Update usage count
+    const { error: usageError } = await supabase
+      .from('subscriptions')
+      .update({ usage_count: subscription.usage_count + 1 })
+      .eq('user_id', user.id)
+
+    if (usageError) {
+      console.error('Error updating usage count:', usageError)
+      // Don't fail the request, just log the error
+    }
+
     return NextResponse.json({ html: cleanedHtml }, {
       headers: {
         'Cache-Control': 'no-store, max-age=0',

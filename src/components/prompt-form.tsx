@@ -3,8 +3,9 @@
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, Sparkles } from 'lucide-react'
+import { Loader2, Sparkles, AlertTriangle } from 'lucide-react'
 import { Label } from './ui/label'
+import { Alert, AlertDescription } from './ui/alert'
 
 interface PromptFormProps {
     prompt: string
@@ -13,6 +14,8 @@ interface PromptFormProps {
     isLoading: boolean
     aiProvider: 'openai' | 'gemini'
     setAiProvider: (provider: 'openai' | 'gemini') => void
+    canGenerate: boolean
+    usageInfo: string
 }
 
 export default function PromptForm({
@@ -22,6 +25,8 @@ export default function PromptForm({
     isLoading,
     aiProvider,
     setAiProvider,
+    canGenerate,
+    usageInfo,
 }: PromptFormProps) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -30,6 +35,15 @@ export default function PromptForm({
 
     return (
         <div className="rounded-lg border bg-background p-6 shadow-sm">
+            {!canGenerate && (
+                <Alert className="mb-6">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                        You've reached your usage limit ({usageInfo}). Please upgrade your plan to continue generating emails.
+                    </AlertDescription>
+                </Alert>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* AI Provider */}
                 <div>
@@ -74,7 +88,7 @@ export default function PromptForm({
                 <Button
                     type="submit"
                     size="lg"
-                    disabled={isLoading || !prompt.trim()}
+                    disabled={isLoading || !prompt.trim() || !canGenerate}
                     className="w-full bg-[var(--color-primary)] text-[var(--color-primary-foreground)] 
              hover:brightness-95 focus-visible:ring-2 
              focus-visible:ring-[var(--color-ring)]"
@@ -91,6 +105,12 @@ export default function PromptForm({
                         </>
                     )}
                 </Button>
+                
+                {usageInfo && (
+                    <div className="text-center text-xs text-muted-foreground">
+                        Usage: {usageInfo}
+                    </div>
+                )}
             </form>
         </div>
     )
